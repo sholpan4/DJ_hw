@@ -20,6 +20,14 @@ def validate_even(val):
                               )
 
 
+def validate_positive(val):
+    if val < 0:
+        raise ValidationError('Число %(value)s должно быть положительным',
+                              code='positive',
+                              params={'value': val}
+                              )
+
+
 class MinMaxValueValidator:
     def __init__(self, min_value, max_value):
         self.min_value = min_value
@@ -56,12 +64,13 @@ class Bb(models.Model):
         ('c', 'Обменяю'),
     )
 
+    id = models.AutoField(primary_key=True, verbose_name='id')
     kind = models.CharField(max_length=1, choices=KINDS, default='s', verbose_name='Тип объявления')
     rubric = models.ForeignKey("Rubric", null=True, on_delete=models.PROTECT, verbose_name='Рубрика')
     title = models.CharField(
         max_length=50,
         verbose_name='Товар',
-        validators=[validators.RegexValidator(regex='^.{4,}$')],
+        validators=[validators.RegexValidator(regex='^.{3,}$')],
         error_messages={'invalid': 'Это мы сами написали'}
     )
     content = models.TextField(null=True, blank=True, verbose_name='Описание')
@@ -72,6 +81,7 @@ class Bb(models.Model):
                                 max_digits=999999999,
                                 # validators=[validators.MinValueValidator(0),
                                 #             validators.DecimalValidator(8, 2)]
+                                validators=[validate_positive, validators.MinValueValidator(0)],
                                 )
     is_active = models.BooleanField(default=is_active_default)
     published = models.DateTimeField(auto_now_add=True, db_index=True, verbose_name='Опубликовано')
@@ -96,9 +106,9 @@ class Bb(models.Model):
             if errors:
                 raise ValidationError(errors)
 
-    def title_and_price(self):
+    def id_title_and_price(self):
         if self.price:
-            return f'{self.title} ({self.price:.2f})'
+            return f'{self.id} {self.title} ({self.price:.2f})'
         return self.title
 
     class Meta:

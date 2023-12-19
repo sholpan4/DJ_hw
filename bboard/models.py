@@ -64,8 +64,16 @@ class Bb(models.Model):
         ('c', 'Обменяю'),
     )
 
+    CURRENCY = (
+        ('kzt', 'Тенге'),
+        ('usd', 'Доллар'),
+    )
+
+    list_field = models.TextField(null=True, blank=True, verbose_name='Лист для заполнения')
+
     id = models.AutoField(primary_key=True, verbose_name='id')
     kind = models.CharField(max_length=1, choices=KINDS, default='s', verbose_name='Тип объявления')
+    currency = models.CharField(max_length=3, choices=CURRENCY, default='kzt', verbose_name='Валюта')
     rubric = models.ForeignKey("Rubric", null=True, on_delete=models.PROTECT, verbose_name='Рубрика')
     title = models.CharField(
         max_length=50,

@@ -132,3 +132,21 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 #     # 'bboard.rubric': lambda rec: "/%s" % rec.pk,
 #     'bboard.rubric': lambda rec: f"/{rec.pk}/",
 # }
+
+# LOGGING = {
+#     'version': 1,
+#     'disable_existing_loggers': False,
+#     'handlers': {
+#         'file': {
+#             'level': 'INFO',
+#             'class': 'logging.FileHandler',
+#             'filename': '/path/to/your/logfile.log',
+#         },
+#     },
+#     'loggers': {
+#         'my_logger': {
+#             'handlers': ['file'],
+#             'level': 'INFO',
+#         },
+#     },
+# }

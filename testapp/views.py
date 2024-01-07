@@ -1,5 +1,7 @@
 import json
+import logging
 
+from django.contrib.auth.decorators import login_required
 from django.core.serializers.json import DjangoJSONEncoder
 from django.shortcuts import render, redirect, get_object_or_404, get_list_or_404
 from django.http import StreamingHttpResponse, FileResponse, JsonResponse
@@ -42,9 +44,29 @@ from bboard.models import Rubric, Bb
 def index(request):
     rubric = get_object_or_404(Rubric, name="Транспорт")
     bbs = get_list_or_404(Bb, rubric=rubric)
-
     res = resolve('/2/')
-
     context = {'title': 'Test side', 'bbs': bbs, 'res': res}
-
     return render(request, 'test.html', context)
+
+
+@login_required
+def protected_view(request):
+    user = request.user
+    tasks = user.tasks.all()
+    context = {'user': user, 'tasks': tasks}
+    return render(request, 'protected_template.html', context)
+
+
+logger = logging.getLogger('my_logger')
+
+
+def log_request_data(request):
+    request_data = {
+        'path': request.path,
+        'method': request.method,
+        'user_agent': request.META.get('HTTP_USER_AGENT', 'N/A'),
+    }
+
+    logger.info(request_data)
+
+    return render(request, 'template_name.html')

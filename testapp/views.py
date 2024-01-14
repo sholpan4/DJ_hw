@@ -7,8 +7,10 @@ from django.shortcuts import render, redirect, get_object_or_404, get_list_or_40
 from django.http import StreamingHttpResponse, FileResponse, JsonResponse
 from django.urls import resolve
 from django.views.decorators.http import require_http_methods, require_GET
+from django.views.generic import ListView
 
 from bboard.models import Rubric, Bb
+from .models import SMS
 
 
 # def index(request):
@@ -70,3 +72,10 @@ def log_request_data(request):
     logger.info(request_data)
 
     return render(request, 'template_name.html')
+
+
+class SMSListView(ListView):
+    model = SMS
+    template_name = 'sms_list.html'
+    context_object_name = 'sms_list'
+

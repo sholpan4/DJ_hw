@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>All Users</title>
+</head>
+<body>
+<form id='userDetailsForm' action="{% url 'user_details' user_id=0 %}" method="get">
+    <label for="userIdInput">User ID:</label>
+    <input type="text" id="userIdInput" name="user_id">
+    <button type="submit">Get User Details</button>
+</form>
+<script>
+    document.getElementById('userDetailsForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        var userIdInput = document.getElementById('userIdInput').value;
+        var action = this.getAttribute('action').replace('0', userIdInput);
+        this.setAttribute('action', action);
+        this.submit();
+    });
+</script>
+
+</body>
+</html>

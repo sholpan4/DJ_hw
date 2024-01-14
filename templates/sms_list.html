@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SMS</title>
+</head>
+<body>
+
+<h2>SMS List</h2>
+<ul>
+    {% for sms in sms_list %}
+        <li>{{ sms.sender }}: {{ sms.message }} ({{ sms.timestamp }})</li>
+    {% endfor %}
+</ul>
+
+</body>
+</html>

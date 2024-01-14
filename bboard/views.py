@@ -1,59 +1,25 @@
+from django.contrib.auth.models import User
 from django.db.models import Count
-from django.shortcuts import render, get_object_or_404, get_list_or_404
-from django.http import HttpResponse, HttpResponseRedirect, HttpResponsePermanentRedirect, HttpResponseNotFound, Http404
+from django.shortcuts import render
+from django.http import HttpResponse
 from django.urls import reverse_lazy, reverse
 from django.views.generic import DetailView
-from django.views.generic.base import TemplateView
+from django.views.generic.base import TemplateView, View
 from django.template import loader
 from django.template.loader import get_template, render_to_string
 from django.views.generic.edit import CreateView
 
 from .forms import BbForm, RubricForm
-from .models import Bb, Rubric  #находимся в bboard
+from .models import Bb, Rubric
 
 
 def index(request):
     bbs = Bb.objects.all()
     rubrics = Rubric.objects.annotate(cnt=Count('bb')).filter(cnt__gt=0)
     context = {'bbs': bbs, 'rubrics': rubrics}
-
-    # bbs = Bb.objects.order_by('-published')
-    # rubrics = Rubric.objects.all()
-    # rubrics = Rubric.objects.filter(bb__isnull=False).distinct()
-
-    # template = get_template('index.html')
-    # return HttpResponse(
-    #     # template.render(context=context, request=request))
-    #     template.render(context, request))
-    # return render(request, 'index.html', context)
     return HttpResponse (
         render_to_string('index.html', context, request)
     )
-
-
-# def index(request):
-#     rubrics = get_object_or_404(Rubric.objects.annotate(cnt=Count('bb')).filter(cnt__gt=0))
-#     bbs = get_list_or_404(Bb, rubric=rubrics)
-#     context = {'bbs': bbs, 'rubric': rubrics}
-#     return HttpResponse(render_to_string('index.html', context, request))
-
-
-# def index(request):
-#     bbs = Bb.objects.order_by('-published')
-#     # rubrics = Rubric.objects.all()
-#     # rubrics = Rubric.objects.filter(bb__isnull=False).distinct()
-#     rubrics = Rubric.objects.annotate(cnt=Count('bb')).filter(cnt__gt=0)
-#     context = {'bbs': bbs, 'rubrics': rubrics}
-#     return render(request, 'index.html', context)
-
-
-# def by_rubric(request, rubric_id):
-#     bbs = Bb.objects.filter(rubric=rubric_id)
-#     # rubrics = Rubric.objects.all()
-#     rubrics = Rubric.objects.annotate(cnt=Count('bb')).filter(cnt__gt=0)
-#     current_rubric = Rubric.objects.get(pk=rubric_id)
-#     context = {'bbs': bbs, 'rubrics': rubrics, 'current_rubric': current_rubric}
-#     return render(request, 'by_rubric.html', context)
 
 
 class BbByRubricView(TemplateView):
@@ -65,34 +31,6 @@ class BbByRubricView(TemplateView):
         context['rubrics'] = Rubric.objects.all()
         context['current_rubric'] = Rubric.objects.get(pk=context['rubric_id'])
         return context
-
-
-# def add_and_save(request):
-#     print(request.headers['Accept-Encoding'])
-#     print(request.headers['accept-encoding'])
-#     print(request.headers['accept_encoding'])
-#     print(request.headers['Cookie'])
-#     print(request.resolver_match)
-#     print(request.body)
-#
-#     # if request.is_ajax():
-#     # if request.headers.get('x-request-with') == 'XMLHttpRequest':
-#
-#     if request.method == 'POST':
-#         bbf = BbForm(request.POST)
-#         if bbf.is_valid():
-#             bbf.save()
-#             return HttpResponseRedirect(
-#                 reverse('bboard:by_rubric',
-#                         kwargs={'rubric_id': bbf.cleaned_data['rubric'].pk})
-#             )
-#         else:
-#             context = {'form': bbf}
-#             return render(request, 'create.html', context)
-#     else:
-#         bbf = BbForm()
-#         context = {'form': bbf}
-#         return render(request, 'create.html', context)
 
 
 class BbCreateView(CreateView):
@@ -119,23 +57,13 @@ class RubricCreateView(CreateView):
         return context
 
 
-# def detail(request, bb_id):
-#     try:
-#         bb = Bb.objects.get(pk=bb_id)
-#     except Bb.DoesNotExist:
-#         # return HttpResponseNotFound('Такое объявление не существует')
-#         raise Http404('Такое объявление не существует')
-#     return HttpResponse()
-
-# class BbDetailView(DetailView):
-#     template_name = ''
-#     form_class = BbSms
-#     success_url = reverse_lazy
+class AllUsersView(View):
+    def get(self, request):
+        users = User.objects.all()
+        return render(request, 'all.users.html', {'users': users})
 
 
-
-# def index_old(request):
-#     template = loader.get_template('index.html')
-#     bbs = Bb.objects.order_by('-published')
-#     context = {'bbs': bbs}
-#     return HttpResponse(template.render(context, request))
+class UserDetailsView(View):
+    def get(self, request, user_id=None):
+        user = User.objects.get(id=user_id)
+        return render(request, 'user_details.html', {'user': user})

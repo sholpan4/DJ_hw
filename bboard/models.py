@@ -103,3 +103,12 @@ class Bb(models.Model):
         verbose_name_plural = 'Объявления'
         verbose_name = 'Объявление'
         ordering = ['-published', 'title']
+
+
+class Post(models.Model):
+    title = models.CharField(max_length=255)
+    content = models.TextField()
+    put_date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.title

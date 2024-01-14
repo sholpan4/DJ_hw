@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django.db.models import Count
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.urls import reverse_lazy, reverse
 from django.views.generic import DetailView
 from django.views.generic.base import TemplateView, View
@@ -10,7 +10,7 @@ from django.template.loader import get_template, render_to_string
 from django.views.generic.edit import CreateView
 
 from .forms import BbForm, RubricForm
-from .models import Bb, Rubric
+from .models import Bb, Rubric, Post
 
 
 def index(request):
@@ -57,13 +57,41 @@ class RubricCreateView(CreateView):
         return context
 
 
-class AllUsersView(View):
-    def get(self, request):
+class AllUsersView(TemplateView):
+    template_name = 'all_users.html'
+
+    def get(self, request, **kwargs):
         users = User.objects.all()
         return render(request, 'all.users.html', {'users': users})
 
 
-class UserDetailsView(View):
-    def get(self, request, user_id=None):
-        user = User.objects.get(id=user_id)
+class UserDetailsView(TemplateView):
+    template_name = 'user_datails.html'
+
+    def get(self, request, **kwargs):
+        user = User.objects.get_context_data(**kwargs)
         return render(request, 'user_details.html', {'user': user})
+
+
+class SinglePostView(TemplateView):
+    template_name = 'single_post.html'
+
+    def get(self, request, **kwargs):
+        posts = Post.objects.get(pk=Post.pk)
+        return render(request, 'single_post.html', {'posts': posts})
+
+
+class ChronologicalPostsView(TemplateView):
+    template_name = 'chron_post.html'
+
+    def get(self, request, **kwargs):
+        posts = Post.objects.all().order_by('-pub_date')
+        return render(request, 'chronological_posts.html', {'posts': posts})
+
+    def get_queryset(self):
+        return Post.objects.all().order_by('-pub_date')
+
+    def get_json(self, request):
+        posts = self.get_queryset()
+        data = {'posts': [{'id': Post.pk, 'title': Post.title, 'pub_date': Post.put_date} for post in posts]}
+        return JsonResponse(data)

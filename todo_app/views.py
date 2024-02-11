@@ -24,7 +24,8 @@ class TaskList(LoginRequiredMixin, ListView):
 
         search_input = self.request.GET.get('search_area') or ''
         if search_input:
-            context['task'] = context['task'].filter(title__icontains = search_input)
+            context['task'] = context['task'].filter(title__icontains=search_input)
+            # context['task'] = context['task'].filter(title__startswith=search_input)
             context['search_input'] = search_input
         return context
 
@@ -59,7 +60,7 @@ class TaskDelete(LoginRequiredMixin, DeleteView):
 
 class NewLoginView(LoginView):
     template_name = 'todo_app/login.html'
-    fields = '__all__'
+    fields = "__all__"
     redirect_authenticated_user = False
 
     def get_success_url(self):
